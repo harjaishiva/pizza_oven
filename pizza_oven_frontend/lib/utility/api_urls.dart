@@ -1,0 +1,24 @@
+// const baseUrl = 'http://10.0.2.2:3000/api/';
+const baseUrl = 'https://97jfzdmz-3000.inc1.devtunnels.ms/api/';
+
+const verifyToken = "auth/verify_token";
+const signUp = "auth/sign_up";
+const signIn = "auth/sign_in";
+const getOtp = "auth/get_otp/";
+const verifyOtp = "auth/verify_otp";
+const verifyuser = "auth/verify_user";
+const updatePassword = "auth/update_password";
+const addToCart = "cart/add_to_cart";
+const getCart = "cart/get_cart/";
+const deleteFromCart = "cart/delete_from_cart";
+const updateQuantity = "cart/update_quantity";
+const getHomeData = "item/get_home_data";
+const getoneItem = "item/get_one_item/";
+const updateFavourite = "item/update_favourite/";
+const getProfile = "profile/get_profile/";
+const editprofile = "profile/edit_profile";
+const imageUpload = "profile/image_upload/";
+const addAddress = "profile/add_address";
+const deleteAddress = "profile/delete_address";
+const updateAddress = "profile/update_address";
+const getAddress = "profile/get_address/";
