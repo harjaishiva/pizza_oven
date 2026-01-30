@@ -106,7 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               XFile? imageFile =
                   await picker.pickImage(source: ImageSource.gallery);
               setState(() {
-                image = File(imageFile?.path ?? 'images/splash.jpg');
+                image = File(imageFile?.path ?? '');
               });
               // ignore: use_build_context_synchronously
               context.read<ProfileCubit>().callImageUpload(imageFile?.path ?? "");
@@ -131,7 +131,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           color: cardColor, borderRadius: BorderRadius.circular(30)),
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.symmetric(horizontal: 15),
-      height: MediaQuery.of(context).size.height * 0.7,
+      height: MediaQuery.of(context).size.height * 0.75,
       child: Column(
         children: [
           SizedBox(
@@ -336,7 +336,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   addressInfo(ProfileState state) {
     return Container(
       constraints:
-          BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.25),
+          BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.27),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
           border: Border.all(

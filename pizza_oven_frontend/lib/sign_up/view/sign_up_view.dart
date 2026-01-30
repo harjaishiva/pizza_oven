@@ -23,6 +23,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final FocusNode emailNode = FocusNode();
   final FocusNode passwordNode = FocusNode();
 
+  bool firsttime = true;
+
+  @override
+  void initState() {
+    super.initState();
+    if(firsttime){
+          setState(() {
+            context.read<SignUpCubit>().updateLoading(false);
+          });
+          firsttime = false;
+        }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<SignUpCubit, SignUpState>(

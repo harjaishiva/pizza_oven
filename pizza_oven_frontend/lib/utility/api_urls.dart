@@ -1,5 +1,6 @@
-// const baseUrl = 'http://10.0.2.2:3000/api/';
-const baseUrl = 'https://97jfzdmz-3000.inc1.devtunnels.ms/api/';
+const baseUrl = 'http://10.0.2.2:3000/api/';
+// const baseUrl = 'http://localhost:3000/api/';
+// const baseUrl = 'https://jnvgxnfx-3000.inc1.devtunnels.ms/api/';
 
 const verifyToken = "auth/verify_token";
 const signUp = "auth/sign_up";

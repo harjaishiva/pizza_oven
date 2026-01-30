@@ -15,6 +15,10 @@ const swaggerOptions = {
       {
         url: `http://localhost:${port}/api`,
         description: "Local server"
+      },
+      {
+        url: `https://jnvgxnfx-3000.inc1.devtunnels.ms/api`,
+        description: "Live server"
       }
     ],
     components: {

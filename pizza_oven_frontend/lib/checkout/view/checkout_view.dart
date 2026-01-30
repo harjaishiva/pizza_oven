@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pizza_oven_frontend/checkout/cubit/checkout_cubit.dart';
 import 'package:pizza_oven_frontend/home/cubit/home_cubit.dart';
 import 'package:pizza_oven_frontend/home/view/home_view.dart';
+import 'package:pizza_oven_frontend/profile/cubit/profile_cubit.dart';
+import 'package:pizza_oven_frontend/profile/view/edit_profile_view.dart';
 import 'package:pizza_oven_frontend/utility/colors.dart';
 import 'package:pizza_oven_frontend/utility/widgets.dart';
 
@@ -70,21 +72,28 @@ class _CheckOutScreenStateState extends State<CheckOutScreen> {
                                   fontSize: 25,
                                   fontWeight: FontWeight.bold)),
                           (state.addressModel?.addresses?.isNotEmpty ?? false)
-                              ? Row(
-                                  children: [
-                                    GestureDetector(
-                                        onTap: () {},
-                                        child: const Icon(Icons.add,
-                                            color: Colors.white,
-                                            weight: 40,
-                                            size: 30)),
-                                    Text("New",
-                                        style: GoogleFonts.actor(
-                                            color: Colors.white,
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w500)),
-                                  ],
-                                )
+                              ? GestureDetector(
+                                onTap:() async {
+                                  var ret = await Navigator.push(context,MaterialPageRoute(builder: (_)=>BlocProvider(create: (_)=>ProfileCubit(),child:const EditProfileScreen(editSection: "A"))));
+                                  if(ret != null && ret == true){
+                                    // ignore: use_build_context_synchronously
+                                    context.read<CheckoutCubit>().callgetAddress();
+                                  }
+                                },
+                                child: Row(
+                                    children: [
+                                      const Icon(Icons.add,
+                                          color: Colors.white,
+                                          weight: 40,
+                                          size: 30),
+                                      Text("New",
+                                          style: GoogleFonts.actor(
+                                              color: Colors.white,
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.w500)),
+                                    ],
+                                  ),
+                              )
                               : const SizedBox(),
                         ],
                       ),

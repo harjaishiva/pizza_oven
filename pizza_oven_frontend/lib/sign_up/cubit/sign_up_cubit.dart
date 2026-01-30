@@ -9,6 +9,10 @@ part 'sign_up_state.dart';
 
 class SignUpCubit extends Cubit<SignUpState> {
   SignUpCubit() : super(SignUpInitial());
+
+  updateLoading(bool value){
+    emit(state.copyWith(loading: value));
+  }
   
   callSignUp({required String name, required String email, required String password}) async{
     try{

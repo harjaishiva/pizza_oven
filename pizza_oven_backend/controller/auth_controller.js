@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const {code} = require('../constants');
 const jwt = require('jsonwebtoken');
 const methods = require('../methods');
+const path = require("path");
 require('dotenv').config();
 
 const signUp = asyncHandler(
@@ -51,7 +52,8 @@ const signIn = asyncHandler(
                 let name = isUser[0]['name'];
                 const payLoad = {name, email};
                 const token = jwt.sign(payLoad,secretKey,{expiresIn:"24h"});
-                return res.status(code.Success).json({status: 0,message:"Logged in successfully",token:token,userId:isUser[0]['id'],image:isUser[0]['image']});
+                const imagePath = `http://10.0.2.2:3000${isUser[0]['image']}`;//path.join("http://10.0.2.2:3000", isUser[0]['image'] );
+                return res.status(code.Success).json({status: 0,message:"Logged in successfully",token:token,userId:isUser[0]['id'],image:imagePath});
             }
             else{
                 return res.status(code.Unaccessible).json({status: 1,message:"Password does not match",token:"",userId:"",image:""});
