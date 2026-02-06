@@ -23,3 +23,4 @@ const addAddress = "profile/add_address";
 const deleteAddress = "profile/delete_address";
 const updateAddress = "profile/update_address";
 const getAddress = "profile/get_address/";
+const getFavourite = "item/get_favourite/";

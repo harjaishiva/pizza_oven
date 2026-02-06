@@ -6,6 +6,7 @@ import 'package:pizza_oven_frontend/checkout/model/address_model.dart';
 import 'package:pizza_oven_frontend/utility/api_urls.dart';
 import 'package:http/http.dart' as http;
 import 'package:pizza_oven_frontend/utility/shared_preferences.dart';
+import 'package:pizza_oven_frontend/utility/sqflite_service.dart';
 
 part 'checkout_state.dart';
 
@@ -38,6 +39,17 @@ class CheckoutCubit extends Cubit<CheckoutState> {
 
     }catch(e){
       log("ERROR == $e");
+    }
+  }
+
+  clearCart() async{
+    int result = await AppDataBase.instance.deleteCart();
+
+    if(result == 1){
+      return true;
+    }
+    else{
+      return false;
     }
   }
   

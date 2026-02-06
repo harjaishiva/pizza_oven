@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pizza_oven_frontend/cart/cubit/cart_cubit.dart';
+import 'package:pizza_oven_frontend/cart/view/cart_view.dart';
+import 'package:pizza_oven_frontend/favourite/favourite_cubit/favourite_cubit.dart';
+import 'package:pizza_oven_frontend/favourite/view/favourite_screen.dart';
 import 'package:pizza_oven_frontend/profile/cubit/profile_cubit.dart';
 import 'package:pizza_oven_frontend/profile/view/profile_view.dart';
 import 'package:pizza_oven_frontend/sign_in/cubit/sign_in_cubit.dart';
@@ -75,6 +79,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               if(index == 0){
                 bool ret = await Navigator.push(context, MaterialPageRoute(builder:(_)=>BlocProvider(create: (_)=>ProfileCubit(), child: const ProfileScreen())));
                 if(ret){setState((){image = SharedPreferencesClass.prefs.getString(iMAGE) ?? "";});}
+              }else if(index == 2){
+                Navigator.of(context).push(MaterialPageRoute(builder:(_)=>BlocProvider(create:(_)=>FavouriteCubit(),child: const FavouriteScreen())));
+              }else if(index == 3){
+                Navigator.of(context).push(MaterialPageRoute(builder:(_)=>BlocProvider(create:(_)=>CartCubit(),child: const CartScreen())));
               }
             },
             child: Container(

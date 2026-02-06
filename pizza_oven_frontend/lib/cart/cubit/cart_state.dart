@@ -1,24 +1,25 @@
 part of 'cart_cubit.dart';
 
 class CartState {
-  const CartState({this.loading = true, this.message = "", this.isSuccess = false, this.cartModel});
+  const CartState({this.loading = true, this.message = "", this.isSuccess = false,/* this.cartModel*/});
 
   final bool loading;
   final String message;
   final bool isSuccess;
-  final CartModel? cartModel;
+  // final CartModel? cartModel;
 
   CartState copyWith(
     {bool? loading,
     String? message,
     bool? isSuccess,
-    CartModel? cartModel}
+    // CartModel? cartModel
+    }
   ){
     return CartState(
       loading: loading ?? this.loading,
       message: message ?? this.message,
       isSuccess: isSuccess ?? this.isSuccess,
-      cartModel: cartModel ?? this.cartModel
+      // cartModel: cartModel ?? this.cartModel
           );
   }
 }

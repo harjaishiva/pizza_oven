@@ -369,8 +369,11 @@ class _CheckOutScreenStateState extends State<CheckOutScreen> {
               ? const Spacer()
               : const SizedBox(),
           GestureDetector(
-            onTap: () {
-              showCustomPopupOne(context, "Order is Placed", 'S', () {
+            onTap: () async {
+              bool clear = await context.read<CheckoutCubit>().clearCart();
+              if(clear){
+                // ignore: use_build_context_synchronously
+                showCustomPopupOne(context, "Order is Placed", 'S', () {
                 Navigator.of(context).pop();
                 Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(
@@ -379,6 +382,7 @@ class _CheckOutScreenStateState extends State<CheckOutScreen> {
                             child: const HomeScreen())),
                     (route) => false);
               });
+              }
             },
             child: Container(
               alignment: Alignment.center,

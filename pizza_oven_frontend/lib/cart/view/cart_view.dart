@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pizza_oven_frontend/cart/cubit/cart_cubit.dart';
+import 'package:pizza_oven_frontend/cart/model/cart_model.dart';
 import 'package:pizza_oven_frontend/checkout/cubit/checkout_cubit.dart';
 import 'package:pizza_oven_frontend/checkout/view/checkout_view.dart';
 import 'package:pizza_oven_frontend/utility/colors.dart';
@@ -15,71 +16,72 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-
-  final  List<int> _counter = [];
   bool firstTime = true;
   String subTotal = "";
   String tax = "";
   String total = "";
+  List<Cart>? cartList = [];
+  List<double> prices = [];
+  List<int> counter = [];
 
   @override
   void initState() {
     super.initState();
-    context.read<CartCubit>().callCartData();
+    getCart(context);
+  }
+
+  getCart(BuildContext context) async {
+    cartList = await context.read<CartCubit>().callCartData();
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, state) {
-        if(firstTime && state.isSuccess){
-          firstTime = false;
-          for(int i = 0; i < (state.cartModel?.data?.length ?? 0); i++){
-            _counter.add(state.cartModel?.data?[i].quantity ?? 1);
-          }
-        }
-        List values = context.read<CartCubit>().cacultion();
-        subTotal = values[0].toString();
-        tax = values[1].toString();
-        total = values[2].toString();
-          return Scaffold(
-            backgroundColor: backGroundTheme,
-            appBar: AppBar(
-                backgroundColor: backGroundTheme,
-                leading: GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child:
-                        Icon(Icons.arrow_back_ios, color: iconColor, size: 25)),
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text("Cart",
-                        style: GoogleFonts.caveat(
-                            color: textColor,
-                            fontSize: 25,
-                            fontWeight: FontWeight.w800)),
-                  ],
-                )),
-            body: state.loading ? loader() :
-            (state.cartModel?.data?.isNotEmpty == true) ? Column(
-              children: [upperSection(state),bottomSection()],
-            ) : noData("Cart is Empty"),
-          );
+        uiRefresh();
+        return Scaffold(
+          backgroundColor: backGroundTheme,
+          appBar: AppBar(
+              backgroundColor: backGroundTheme,
+              leading: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child:
+                      Icon(Icons.arrow_back_ios, color: iconColor, size: 25)),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text("Cart",
+                      style: GoogleFonts.caveat(
+                          color: textColor,
+                          fontSize: 25,
+                          fontWeight: FontWeight.w800)),
+                ],
+              )),
+          body: state.loading
+              ? loader()
+              : (cartList?.isNotEmpty == true)
+                  ?
+                  //(state.cartModel?.data?.isNotEmpty == true) ?
+                  Column(
+                      children: [upperSection(state), bottomSection()],
+                    )
+                  : noData("Cart is Empty"),
+        );
       },
     );
   }
 
   upperSection(CartState state) {
-    return 
-    // Column(
-    //   children: [
+    return
+        // Column(
+        //   children: [
         Container(
             height: MediaQuery.of(context).size.height * 0.573,
             padding: const EdgeInsets.all(20),
             child: ListView.builder(
-                itemCount: state.cartModel?.data?.length,
+                itemCount: cartList?.length, //state.cartModel?.data?.length,
                 itemBuilder: (context, index) {
                   return listTile(state, index);
                 }));
@@ -111,110 +113,159 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   listTile(CartState state, int index) {
-    return Container(
-      height: 130,
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 20),
-      padding: const EdgeInsets.only(left: 15, top: 10, bottom: 10),
-      decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(20)),
-      child: Row(
-        children: [
-          markedCircle(state, index),
-          const SizedBox(width: 15),
-          Container(
-            height: 80,
-            width: 80,
+    return prices.isEmpty == true
+        ? const SizedBox()
+        : Container(
+            height: 130,
+            width: double.infinity,
+            margin: const EdgeInsets.only(bottom: 20),
+            padding: const EdgeInsets.only(left: 15, top: 10, bottom: 10),
             decoration: BoxDecoration(
-                color: Colors.black, borderRadius: BorderRadius.circular(80)),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(80),
-              child: Image.asset("images/splash.jpg"),
-            ),
-          ),
-            
-           Container(
-            width: 200,
-            padding: const EdgeInsets.only(left: 20),
-            alignment: Alignment.center,
-              child: Column(
-                children: [
-                  Text(state.cartModel?.data?[index].name ?? "N/A",
-                                        style: GoogleFonts.caveat(
-                                            color: backGroundTheme,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 20),
-                                            softWrap: true,
-                                            overflow: TextOverflow.ellipsis,),
-                  Text("₹ ${state.cartModel?.data?[index].totalPrice ?? "N/A"}",
-                      style: GoogleFonts.inter(
-                          color: buttonColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500)),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              if (_counter[index] != 1) {
-                                _counter[index]--;
-                                context.read<CartCubit>().callupdateQuantity(state.cartModel?.data?[index].pizzaId.toString() ?? "", _counter[index].toString());
-                              }
-                            });
-                          },
-                          child: Container(
-                              height: 35,
-                              width: 35,
-                              decoration: BoxDecoration(
-                                color: const Color(0xffF9D9B5),
-                                borderRadius: BorderRadius.circular(35),
-                              ),
-                              child: Icon(Icons.remove,
-                                  color: backGroundTheme, size: 22)),
-                        ),
-                        const SizedBox(width: 15),
-                        Text("${_counter[index]}",
-                            style: GoogleFonts.inter(
-                                color: buttonColor,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500)),
-                        const SizedBox(width: 15),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                                _counter[index]++;
-                                
-                            });
-                            context.read<CartCubit>().callupdateQuantity(state.cartModel?.data?[index].pizzaId.toString() ?? "", _counter[index].toString());
-                          },
-                          child: Container(
-                              height: 35,
-                              width: 35,
-                              decoration: BoxDecoration(
-                                color: const Color(0xffF9D9B5),
-                                borderRadius: BorderRadius.circular(35),
-                              ),
-                              child: Icon(Icons.add,
-                                  color: backGroundTheme, size: 22)),
-                        ),
-                      ],
-                    ),
+                color: Colors.white, borderRadius: BorderRadius.circular(20)),
+            child: Row(
+              children: [
+                markedCircle(state, index),
+                const SizedBox(width: 15),
+                Stack(
+                  clipBehavior: Clip.none,
+                  children:[
+                    Container(
+                  height: 80,
+                  width: 80,
+                  decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(80)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(80),
+                    child: Image.asset("images/splash.jpg"),
                   ),
-                ],
-              ),
+                ),
+
+                Positioned(
+                  bottom: -10,
+                  right: 22,
+                  child: CircleAvatar(
+                    backgroundColor: const Color(0xffF9D9B5),
+                    radius: 15,
+                    child: Text(cartList?[index].size ?? "N/A"),
+                  ),
+                ),
+                  ]
+                ),
+                Container(
+                  width: 200,
+                  padding: const EdgeInsets.only(left: 20),
+                  alignment: Alignment.center,
+                  child: Column(
+                    children: [
+                      Text(
+                        cartList?[index].name ?? "N/A",
+                        style: GoogleFonts.caveat(
+                            color: backGroundTheme,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20),
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                          ((prices[index]) * (cartList?[index].quantity ?? 0))
+                              .toString(),
+                          style: GoogleFonts.inter(
+                              color: buttonColor,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500)),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            GestureDetector(
+                              onTap: () async {
+                                bool isSub = false;
+                                setState(() {
+                                  if (counter[index] != 1) {
+                                    counter[index]--;
+                                  }
+                                });
+                                isSub = await context
+                                    .read<CartCubit>()
+                                    .callupdateQuantity(
+                                        (cartList?[index].id ?? "0").toString(),
+                                        counter[index].toString());
+                                if (isSub) {
+                                  // ignore: use_build_context_synchronously
+                                  getCart(context);
+                                  uiRefresh();
+                                  setState(() {});
+                                }
+                              },
+                              child: Container(
+                                  height: 35,
+                                  width: 35,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xffF9D9B5),
+                                    borderRadius: BorderRadius.circular(35),
+                                  ),
+                                  child: Icon(Icons.remove,
+                                      color: backGroundTheme, size: 22)),
+                            ),
+                            const SizedBox(width: 15),
+                            Text("${counter[index]}",
+                                style: GoogleFonts.inter(
+                                    color: buttonColor,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500)),
+                            const SizedBox(width: 15),
+                            GestureDetector(
+                              onTap: () async {
+                                setState(() {
+                                  counter[index]++;
+                                });
+                                bool isAdded = await context
+                                    .read<CartCubit>()
+                                    .callupdateQuantity(
+                                        (cartList?[index].id ?? "0").toString(),
+                                        counter[index].toString());
+                                if (isAdded) {
+                                  // ignore: use_build_context_synchronously
+                                  getCart(context);
+                                  uiRefresh();
+                                  setState(() {});
+                                }
+                              },
+                              child: Container(
+                                  height: 35,
+                                  width: 35,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xffF9D9B5),
+                                    borderRadius: BorderRadius.circular(35),
+                                  ),
+                                  child: Icon(Icons.add,
+                                      color: backGroundTheme, size: 22)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-        ],
-      ),
-    );
+          );
   }
 
   markedCircle(CartState state, int index) {
     return GestureDetector(
-      onTap:(){
-        context.read<CartCubit>().calldeleteFromCart(state.cartModel?.data?[index].pizzaId.toString() ?? "",state.cartModel?.data?[index].cartId.toString() ?? "" );
+      onTap: () async {
+        bool isDeleted = await context
+            .read<CartCubit>()
+            .calldeleteFromCart(cartList?[index].id.toString() ?? "0");
+        if (isDeleted) {
+          // ignore: use_build_context_synchronously
+          getCart(context);
+          uiRefresh();
+          setState(() {});
+        }
       },
       child: Container(
         alignment: Alignment.center,
@@ -332,7 +383,10 @@ class _CartScreenState extends State<CartScreen> {
                         MaterialPageRoute(
                             builder: (_) => BlocProvider(
                                 create: (_) => CheckoutCubit(),
-                                child: CheckOutScreen(subTotal: subTotal,tax: tax,total: total))));
+                                child: CheckOutScreen(
+                                    subTotal: subTotal,
+                                    tax: tax,
+                                    total: total))));
                   },
                   child: Container(
                       decoration: BoxDecoration(
@@ -353,5 +407,14 @@ class _CartScreenState extends State<CartScreen> {
         ],
       ),
     );
+  }
+
+  uiRefresh() {
+    List values = context.read<CartCubit>().cacultion(cartList, true);
+    counter = values[0];
+    prices = values[1];
+    subTotal = values[2].toString();
+    tax = values[3].toString();
+    total = values[4].toString();
   }
 }

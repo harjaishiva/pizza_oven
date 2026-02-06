@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
+import 'package:pizza_oven_frontend/cart/model/cart_model.dart';
 import 'package:pizza_oven_frontend/item/model/items_model.dart';
 import 'package:pizza_oven_frontend/utility/api_urls.dart';
 import 'package:pizza_oven_frontend/utility/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:pizza_oven_frontend/utility/sqflite_service.dart';
 
 part 'item_state.dart';
 
@@ -68,39 +70,52 @@ callItemdata(String itemId) async{
     }
   }
 
-  callAddToCart({required String pizzaId, required String size, required String quantity}) async{
+  callAddToCart({required String pizzaId, required String pname, required String price, required String size, required String quantity}) async{
     try{
 
       emit(state.copyWith(sLoading: true));
 
-      var token = SharedPreferencesClass.prefs.getString(tOKEN);
-      var userId = SharedPreferencesClass.prefs.getString(uSERID);
+      Cart cart = Cart(pizzaId: int.parse(pizzaId),name: pname, price: double.parse(price), size: size, quantity: int.parse(quantity));
 
-    const url = baseUrl+addToCart;
-    Map map = {
-      "user_id": userId,
-      "pizza_id": pizzaId,
-      "size": size,
-      "quantity": quantity
-    };
+      int result = await AppDataBase.instance.insertInCart(cart);
+      log("$result");
 
-    var requestBody = jsonEncode(map);
-    log("URL == $url\nRequestbody == $requestBody");
-    var uri = Uri.parse(url);
-    var response = await http.post(uri,headers: {"Content-Type" : "application/json","Authorization": "Bearer $token"},body:requestBody);
-    if(response.statusCode == 200){
-      var responseBody = jsonDecode(response.body);
-      log(response.body);
-      log("$responseBody");
-      emit(state.copyWith(sLoading: false, message: responseBody['message'], isSuccessC: true));
-    }else if(response.statusCode == 204){
-      emit(state.copyWith(sLoading: false, message: "Updated the pre existing order", isSuccessC: true));
-    }else{
-      var responseBody = jsonDecode(response.body);
-      log("$responseBody");
-      log(response.body);
-      emit(state.copyWith(sLoading: false, message: responseBody['message'], isSuccessC: false));
-    }
+      if(result <= 0){
+        emit(state.copyWith(sLoading: false));
+        return 1;
+      }
+      emit(state.copyWith(sLoading: false));
+      return 0;
+
+    //   var token = SharedPreferencesClass.prefs.getString(tOKEN);
+    //   var userId = SharedPreferencesClass.prefs.getString(uSERID);
+
+    // const url = baseUrl+addToCart;
+    // Map map = {
+    //   "user_id": userId,
+    //   "pizza_id": pizzaId,
+    //   "size": size,
+    //   "quantity": quantity
+    // };
+
+    // var requestBody = jsonEncode(map);
+    // log("URL == $url\nRequestbody == $requestBody");
+    // var uri = Uri.parse(url);
+    // var response = await http.post(uri,headers: {"Content-Type" : "application/json","Authorization": "Bearer $token"},body:requestBody);
+    // if(response.statusCode == 200){
+    //   var responseBody = jsonDecode(response.body);
+    //   log(response.body);
+    //   log("$responseBody");
+    //   emit(state.copyWith(sLoading: false, message: responseBody['message'], isSuccessC: true));
+    // }else if(response.statusCode == 204){
+    //   emit(state.copyWith(sLoading: false, message: "Updated the pre existing order", isSuccessC: true));
+    // }else{
+    //   var responseBody = jsonDecode(response.body);
+    //   log("$responseBody");
+    //   log(response.body);
+    //   emit(state.copyWith(sLoading: false, message: responseBody['message'], isSuccessC: false));
+    // }
+
     }catch(e){
       log("ERROR ==== $e");
     }

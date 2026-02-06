@@ -61,7 +61,7 @@ class _ItemScreenState extends State<ItemScreen> {
                 backgroundColor: backGroundTheme,
                 leading: GestureDetector(
                     onTap: () {
-                      Navigator.pop(context);
+                      Navigator.pop(context,true);
                     },
                     child:
                         Icon(Icons.arrow_back_ios, color: iconColor, size: 25)),
@@ -456,11 +456,31 @@ class _ItemScreenState extends State<ItemScreen> {
             ],
           ),
           GestureDetector(
-            onTap: () {
-              context.read<ItemCubit>().callAddToCart(
+            onTap: () async {
+              int inserted = await context.read<ItemCubit>().callAddToCart(
                   pizzaId: widget.itemId,
+                  pname: state.itemModel?.data?.name ?? "N/A",
+                  price: state.itemModel?.data?.price.toString() ?? "0",
                   size: isSmall ? 'S' : (isMedium ? 'M' : 'L'),
                   quantity: _counter.toString());
+
+              if(inserted == 0){
+                // ignore: use_build_context_synchronously
+                showCustomPopupTwo(context, "Added to the cart", 'Home', "Cart", () {
+            Navigator.pop(context);
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => BlocProvider(
+                    create: (_) => HomeCubit(), child: const HomeScreen())));
+          }, () {
+            Navigator.pop(context);
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => BlocProvider(
+                    create: (_) => CartCubit(), child: const CartScreen())));
+          });
+              }else{
+                // ignore: use_build_context_synchronously
+                popUpOne(context, "Unable to add in cart", 'E', (){Navigator.of(context).pop();});
+              }
             },
             child: Container(
               alignment: Alignment.center,

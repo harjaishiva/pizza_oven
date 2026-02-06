@@ -44,6 +44,9 @@ dependencies:
   shared_preferences: ^2.3.3
   image_picker: ^1.1.2
   permission_handler: ^11.3.1
+  sqflite: ^2.3.3+1
+  path: ^1.9.0
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -71,6 +74,15 @@ flutter:
   assets:
     - images/
   #   - images/a_dot_ham.jpeg
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "images/icon.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "images/icon.png"
+  remove_alpha_ios: true
+
 
 dependency_overrides:
   ffi: ^1.2.1
