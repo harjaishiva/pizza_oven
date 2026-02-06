@@ -49,6 +49,28 @@ const getOneItem = asyncHandler(async (req, res) => {
     .json({ status: 0, message: "Success", data: data[0]});
 });
 
+const getFavourites = asyncHandler(
+  async (req, res) => {
+    const userId = req.params.userId;
+
+    if(!userId){
+      return res.status(code.Invalid).json({status:1, message:"All feilds are mandatory!!!"});
+    }
+
+  const [data] = await db.query(
+    "SELECT p.id,p.name,p.image,p.weight,p.price,p.is_veg FROM favourite f JOIN pizza p ON p.id = f.pizza_id WHERE f.user_id = ?;",[userId]
+  );
+  if (data.length <= 0) {
+    return res
+      .status(code.NotFound)
+      .json({ status: 1, message: "Data not found", data: null });
+  }
+
+  return res
+    .status(code.Success)
+    .json({ status: 0, message: "Success", data: data });
+});
+
 const updateFavourite = asyncHandler(
   async(req,res) => {
     const userId = req.params.user_id;
@@ -79,4 +101,4 @@ const updateFavourite = asyncHandler(
 );
 
 
-module.exports = { getHomeData, getOneItem, updateFavourite };
+module.exports = { getHomeData, getOneItem, getFavourites, updateFavourite };

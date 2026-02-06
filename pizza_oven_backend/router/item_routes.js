@@ -57,6 +57,30 @@ router.route("/get_one_item/:user_id/:pizza_id").get(verifyUser,cont.getOneItem)
 
 /**
  * @swagger
+ * /item/get_favourite/{userId}:
+ *   get:
+ *     summary: Get single item's data
+ *     tags: [Items]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID of the user
+ *     responses:
+ *       200:
+ *         description: Success
+ *       400:
+ *         description: Invalid or missing fields
+ *       404:
+ *         description: Item not found
+ */
+
+router.route("/get_favourite/:userId").get(verifyUser,cont.getFavourites);
+
+/**
+ * @swagger
  * /item/update_favourite/{user_id}/{pizza_id}:
  *   put:
  *     summary: adding pizza to or removing pizza from favourites
